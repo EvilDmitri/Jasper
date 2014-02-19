@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{%block title%}List{%endblock%}
+
+{%block main_content%}
+<script>
+function startGrabber() {
+    document.getElementById('title').innerHTML = 'Scraping... Please wait...';
+    var xmlhttp;
+    if (window.XMLHttpRequest)  {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }
+    else {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange=function() {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+          window.location.href = '/';
+      }
+    };
+    xmlhttp.open("GET","grab",true);
+    xmlhttp.send();
+}
+
+</script>
+	<div class="h1" id="title">Items list</div>
+
+    <div class="table-responsive">
+
+
+			<table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in items %}
+
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.cost }} pts/$</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+			</table>
+
+    </div>
+
+{%endblock%}

@@ -1,7 +1,5 @@
-__author__ = 'dimas'
-
 from grab import Grab
-from orm import Saver
+from app import models, db
 
 BASE_URL = 'https://ultimaterewardsearn.chase.com/shopping'
 
@@ -10,32 +8,29 @@ class UltimateRewardsGrabber:
 
     def __init__(self):
         self.g = Grab()
-        self.db_saver = Saver()
 
     def grab(self):
         self.g.go(BASE_URL)
         divs = self.g.doc.select('//div[contains(@class, "mn_srchListSection")]')
         for div in divs:
-
-            merchants = div.text().split('/$')
-            for merchant in merchants:
-
-                try:
+            try:
+                merchants = div.text().split('/$')
+                for merchant in merchants:
                     merchant = merchant.split('Details ')[1]
-                    name = ' '.join(merchant.split(' ')[:-2])
+                    title = ' '.join(merchant.split(' ')[:-2])
                     cost = merchant.split(' ')[-2]
-                    print name, ' - ', cost
+                    print title, ' - ', cost
+            except IndexError:
+                pass
+            merchant = models.Item(title=title, cost=cost)
+            db.session.add(merchant)
+        db.session.commit()
 
-                    m = self.db_saver.merchants_table.insert()
-                    m.execute(name=name, cost=cost)
-
-                except IndexError:
-                    pass
 
     def save(self):
         pass
 
 
 if __name__ == '__main__':
-    #ghost_taleo()
-    pass
+    scraper = UltimateRewardsGrabber()
+    scraper.grab()
